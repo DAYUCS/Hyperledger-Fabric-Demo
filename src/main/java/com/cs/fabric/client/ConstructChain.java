@@ -100,6 +100,10 @@ public class ConstructChain {
 		newChain.initialize();
 
 		System.out.println("Finished initialization chain " + FOO_CHAIN_NAME);
+		
+		newChain.shutdown(true);
+		
+		System.out.println("Shutdown chain " + FOO_CHAIN_NAME);
 
 	}
 }

@@ -8,12 +8,19 @@ import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hyperledger.fabric.sdk.Chain;
+import org.hyperledger.fabric.sdk.EventHub;
 import org.hyperledger.fabric.sdk.HFClient;
+import org.hyperledger.fabric.sdk.Orderer;
 import org.hyperledger.fabric.sdk.exception.CryptoException;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
+import org.hyperledger.fabric.sdk.exception.TransactionException;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
 
@@ -26,6 +33,7 @@ public class ClientHelper {
 
 	private static final String TEST_ADMIN_NAME = "admin";
 	private static final String TESTUSER_1_NAME = "user1";
+	private static final String FOO_CHAIN_NAME = "foo";
 	private static final ClientConfig clientConfig = ClientConfig.getConfig();
 
 	private static final Log logger = LogFactory.getLog(ClientHelper.class);
@@ -108,5 +116,61 @@ public class ClientHelper {
 
 		return matches[0];
 
+	}
+	
+	public Chain getChainWithPeerAdmin() throws NoSuchAlgorithmException, NoSuchProviderException,
+			InvalidKeySpecException, IOException, CryptoException, InvalidArgumentException, TransactionException {
+		SampleOrg sampleOrg = this.getSamleOrg();
+		HFClient client = this.getHFClient();
+		
+		client.setUserContext(sampleOrg.getPeerAdmin());
+		return getChain(sampleOrg, client);
+		
+	}
+	
+	private Chain getChain(SampleOrg sampleOrg, HFClient client) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException,
+			IOException, CryptoException, InvalidArgumentException, TransactionException {
+		
+		Chain chain = client.newChain(FOO_CHAIN_NAME);
+		logger.info("Get Chain " + FOO_CHAIN_NAME);
+
+		chain.setTransactionWaitTime(clientConfig.getTransactionWaitTime());
+		chain.setDeployWaitTime(clientConfig.getDeployWaitTime());
+
+		//Collection<Peer> channelPeers = new LinkedList<>();
+		for (String peerName : sampleOrg.getPeerNames()) {
+			String peerLocation = sampleOrg.getPeerLocation(peerName);
+
+			Properties peerProperties = clientConfig.getPeerProperties(peerName);
+			if (peerProperties == null) {
+				peerProperties = new Properties();
+			}
+			// Example of setting specific options on grpc's
+			// ManagedChannelBuilder
+			peerProperties.put("grpc.ManagedChannelBuilderOption.maxInboundMessageSize", 9000000);
+			//channelPeers.add(client.newPeer(peerName, peerLocation, peerProperties));
+			chain.addPeer(client.newPeer(peerName, peerLocation, peerProperties));
+		}
+
+		Collection<Orderer> orderers = new LinkedList<>();
+
+		for (String orderName : sampleOrg.getOrdererNames()) {
+			orderers.add(client.newOrderer(orderName, sampleOrg.getOrdererLocation(orderName),
+					clientConfig.getOrdererProperties(orderName)));
+		}
+
+		// Just pick the first orderer in the list to create the chain.
+		Orderer anOrderer = orderers.iterator().next();
+		chain.addOrderer(anOrderer);
+		
+		for (String eventHubName : sampleOrg.getEventHubNames()) {
+			EventHub eventHub = client.newEventHub(eventHubName, sampleOrg.getEventHubLocation(eventHubName),
+					clientConfig.getEventHubProperties(eventHubName));
+			chain.addEventHub(eventHub);
+		}
+		
+		chain.initialize();
+		
+		return chain;
 	}
 }
