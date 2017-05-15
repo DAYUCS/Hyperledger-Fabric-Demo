@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,11 +22,13 @@ import org.hyperledger.fabric.sdk.Peer;
 import org.hyperledger.fabric.sdk.ProposalResponse;
 
 import com.cs.fabric.client.utils.ClientHelper;
+import com.cs.fabric.sdk.utils.ClientConfig;
 import com.cs.fabric.sdkintegration.SampleOrg;
 
 public class DeployChainCode {
 
 	private static final ClientHelper clientHelper = new ClientHelper();
+	private static final ClientConfig clientConfig = ClientConfig.getConfig();
 	private static final String FOO_CHAIN_NAME = "foo";
 	private static final String TEST_FIXTURES_PATH = "src/test/fixture";
 	private static final String CHAIN_CODE_NAME = "trade_finance_go";
@@ -149,11 +152,14 @@ public class DeployChainCode {
 		/// Send instantiate transaction to orderer
 		System.out.println("Sending instantiateTransaction to orderer without arguments");
 		chain.sendTransaction(successful, chain.getOrderers()).thenApply(transactionEvent -> {
-			
+
 			if (transactionEvent.isValid()) {
 				System.out.println("Finished transaction with transaction id " + transactionEvent.getTransactionID());
+			} else {
+				System.out.println("Failed to sending instatiate transaction to orderer!");
 			}
+			chain.shutdown(true);
 			return null;
-		});
+		}).get(clientConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
 	}
 }
