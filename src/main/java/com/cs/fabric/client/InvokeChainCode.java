@@ -20,6 +20,7 @@ import org.hyperledger.fabric.sdk.Chain;
 import org.hyperledger.fabric.sdk.ChainCodeID;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.ProposalResponse;
+import org.hyperledger.fabric.sdk.QueryByChaincodeRequest;
 import org.hyperledger.fabric.sdk.TransactionProposalRequest;
 import org.hyperledger.fabric.sdk.exception.CryptoException;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
@@ -116,9 +117,46 @@ public class InvokeChainCode {
 			} else {
 				logger.info("Failed to send transaction proposal to orderer");
 			}
-			//chain.shutdown(true);
+			// chain.shutdown(true);
 			return transactionEvent.getTransactionID();
 		}).get(clientConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
+
+	}
+
+	public void queryByRefNo() throws CryptoException, InvalidArgumentException, NoSuchAlgorithmException,
+			NoSuchProviderException, InvalidKeySpecException, TransactionException, IOException, ProposalException {
+
+		// Create instance of client.
+		HFClient client = clientHelper.getHFClient();
+
+		// Create instance of chain.
+		Chain chain = clientHelper.getChainWithPeerAdmin();
+
+		// Create instance of ChainCodeID
+		ChainCodeID chainCodeID = clientHelper.getChainCodeID();
+
+		QueryByChaincodeRequest queryByChaincodeRequest = client.newQueryProposalRequest();
+		queryByChaincodeRequest.setArgs(args);
+		queryByChaincodeRequest.setFcn("invoke");
+		queryByChaincodeRequest.setChaincodeID(chainCodeID);
+
+		Map<String, byte[]> tm2 = new HashMap<>();
+		tm2.put("HyperLedgerFabric", "QueryByChaincodeRequest:JavaSDK".getBytes(UTF_8));
+		tm2.put("method", "QueryByChaincodeRequest".getBytes(UTF_8));
+		queryByChaincodeRequest.setTransientMap(tm2);
+
+		Collection<ProposalResponse> queryProposals = chain.queryByChaincode(queryByChaincodeRequest, chain.getPeers());
+		for (ProposalResponse proposalResponse : queryProposals) {
+			if (!proposalResponse.isVerified() || proposalResponse.getStatus() != ProposalResponse.Status.SUCCESS) {
+				logger.info("Failed query proposal from peer " + proposalResponse.getPeer().getName() + " status: "
+						+ proposalResponse.getStatus() + ". Messages: " + proposalResponse.getMessage()
+						+ ". Was verified : " + proposalResponse.isVerified());
+			} else {
+				String payload = proposalResponse.getProposalResponse().getResponse().getPayload().toStringUtf8();
+				logger.info("Query payload of IMLC-0001 from peer: " + proposalResponse.getPeer().getName());
+				logger.info("" + payload);
+			}
+		}
 
 	}
 
