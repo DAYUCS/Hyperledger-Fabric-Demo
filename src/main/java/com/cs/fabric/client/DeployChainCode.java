@@ -158,7 +158,7 @@ public class DeployChainCode {
 			} else {
 				logger.info("Failed to sending instatiate transaction to orderer!");
 			}
-			chain.shutdown(true);
+			//chain.shutdown(true);
 			return null;
 		}).get(clientConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
 	}

@@ -9,6 +9,7 @@ import org.hyperledger.fabric_ca.sdk.HFCAClient;
 import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 
 import com.cs.fabric.client.utils.ClientHelper;
+import com.cs.fabric.sdk.utils.ClientConfig;
 import com.cs.fabric.sdk.utils.ClientConfigHelper;
 import com.cs.fabric.sdkintegration.SampleOrg;
 import com.cs.fabric.sdkintegration.SampleStore;
@@ -17,6 +18,7 @@ import com.cs.fabric.sdkintegration.SampleUser;
 public class SetupUsers {
 
 	private static final ClientHelper clientHelper = new ClientHelper();
+	private static final ClientConfig clientConfig = ClientConfig.getConfig();
 	private static final String TEST_ADMIN_NAME = "admin";
 	private static final String TESTUSER_1_NAME = "user1";
 
@@ -29,7 +31,8 @@ public class SetupUsers {
 		configHelper.customizeConfig();
 
 		// Get Org1
-		SampleOrg sampleOrg = clientHelper.getSamleOrg();
+		SampleOrg sampleOrg = clientConfig.getIntegrationTestsSampleOrg("peerOrg1");
+		sampleOrg.setCAClient(HFCAClient.createNewInstance(sampleOrg.getCALocation(), sampleOrg.getCAProperties()));
 
 		////////////////////////////
 		// Set up USERS

@@ -116,7 +116,7 @@ public class InvokeChainCode {
 			} else {
 				logger.info("Failed to send transaction proposal to orderer");
 			}
-			chain.shutdown(true);
+			//chain.shutdown(true);
 			return transactionEvent.getTransactionID();
 		}).get(clientConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
 

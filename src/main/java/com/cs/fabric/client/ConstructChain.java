@@ -101,9 +101,9 @@ public class ConstructChain {
 
 		logger.info("Finished initialization chain " + FOO_CHAIN_NAME);
 		
-		newChain.shutdown(true);
+		//newChain.shutdown(true);
 		
-		logger.info("Shutdown chain " + FOO_CHAIN_NAME);
+		//logger.info("Shutdown chain " + FOO_CHAIN_NAME);
 
 	}
 }
