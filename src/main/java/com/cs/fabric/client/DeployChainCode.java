@@ -31,8 +31,6 @@ public class DeployChainCode {
 	private static final ClientConfig clientConfig = ClientConfig.getConfig();
 	private static final String FOO_CHAIN_NAME = "foo";
 	private static final String TEST_FIXTURES_PATH = "src/test/fixture";
-	private static final String CHAIN_CODE_NAME = "trade_finance_go";
-	private static final String CHAIN_CODE_PATH = "github.com/trade_finance";
 	private static final String CHAIN_CODE_VERSION = "1";
 
 	private static final Log logger = LogFactory.getLog(DeployChainCode.class);
@@ -50,20 +48,22 @@ public class DeployChainCode {
 		Chain chain = clientHelper.getChainWithPeerAdmin();
 		logger.info("Get Chain " + FOO_CHAIN_NAME);
 
-		final ChainCodeID chainCodeID;
+		final ChainCodeID chainCodeID = clientHelper.getChainCodeID();
 		Collection<ProposalResponse> responses;
 		Collection<ProposalResponse> successful = new LinkedList<>();
 		Collection<ProposalResponse> failed = new LinkedList<>();
 
-		chainCodeID = ChainCodeID.newBuilder().setName(CHAIN_CODE_NAME).setVersion(CHAIN_CODE_VERSION)
-				.setPath(CHAIN_CODE_PATH).build();
-		logger.info("Chain Code Name:" + chainCodeID.getName() + "; Version:" + chainCodeID.getVersion() + "; Path:"
-				+ chainCodeID.getPath());
+		// chainCodeID =
+		// ChainCodeID.newBuilder().setName(CHAIN_CODE_NAME).setVersion(CHAIN_CODE_VERSION)
+		// .setPath(CHAIN_CODE_PATH).build();
+		// logger.info("Chain Code Name:" + chainCodeID.getName() + "; Version:"
+		// + chainCodeID.getVersion() + "; Path:"
+		// + chainCodeID.getPath());
 
 		////////////////////////////
 		// Install Proposal Request
 		//
-		System.out.println("Creating install proposal");
+		logger.info("Creating install proposal");
 
 		InstallProposalRequest installProposalRequest = client.newInstallProposalRequest();
 		installProposalRequest.setChaincodeID(chainCodeID);
@@ -73,7 +73,7 @@ public class DeployChainCode {
 				.setChaincodeSourceLocation(new File(TEST_FIXTURES_PATH + "/sdkintegration/gocc/sample2"));
 		installProposalRequest.setChaincodeVersion(CHAIN_CODE_VERSION);
 
-		System.out.println("Sending install proposal");
+		logger.info("Sending install proposal");
 		////////////////////////////
 		// only a client from the same org as the peer can issue an install
 		//////////////////////////// request
@@ -87,7 +87,7 @@ public class DeployChainCode {
 
 		for (ProposalResponse response : responses) {
 			if (response.getStatus() == ProposalResponse.Status.SUCCESS) {
-				System.out.println("Successful install proposal response Txid: " + response.getTransactionID()
+				logger.info("Successful install proposal response Txid: " + response.getTransactionID()
 						+ " from peer" + response.getPeer().getName());
 				successful.add(response);
 			} else {
@@ -95,12 +95,12 @@ public class DeployChainCode {
 			}
 		}
 
-		System.out.println("Received " + numInstallProposal + " install proposal responses. Successful+verified: "
+		logger.info("Received " + numInstallProposal + " install proposal responses. Successful+verified: "
 				+ successful.size() + ". Failed: " + failed.size());
 
 		if (failed.size() > 0) {
 			ProposalResponse first = failed.iterator().next();
-			System.out.println("Not enough endorsers for install :" + successful.size() + ".  " + first.getMessage());
+			logger.info("Not enough endorsers for install :" + successful.size() + ".  " + first.getMessage());
 		}
 
 		///////////////
@@ -125,7 +125,7 @@ public class DeployChainCode {
 				.fromYamlFile(new File(TEST_FIXTURES_PATH + "/sdkintegration/chaincodeendorsementpolicy.yaml"));
 		instantiateProposalRequest.setChaincodeEndorsementPolicy(chaincodeEndorsementPolicy);
 
-		System.out.println("Sending instantiateProposalRequest to all peers without arguments");
+		logger.info("Sending instantiateProposalRequest to all peers without arguments");
 		successful.clear();
 		failed.clear();
 
@@ -134,29 +134,29 @@ public class DeployChainCode {
 		for (ProposalResponse response : responses) {
 			if (response.isVerified() && response.getStatus() == ProposalResponse.Status.SUCCESS) {
 				successful.add(response);
-				System.out.println("Succesful instantiate proposal response Txid: " + response.getTransactionID()
+				logger.info("Succesful instantiate proposal response Txid: " + response.getTransactionID()
 						+ " from peer " + response.getPeer().getName());
 			} else {
 				failed.add(response);
 			}
 		}
-		System.out.println("Received " + responses.size() + " instantiate proposal responses. Successful+verified: "
+		logger.info("Received " + responses.size() + " instantiate proposal responses. Successful+verified: "
 				+ successful.size() + ". Failed: " + failed.size());
 		if (failed.size() > 0) {
 			ProposalResponse first = failed.iterator().next();
-			System.out.println("Not enough endorsers for instantiate :" + successful.size() + "endorser failed with "
+			logger.info("Not enough endorsers for instantiate :" + successful.size() + "endorser failed with "
 					+ first.getMessage() + ". Was verified:" + first.isVerified());
 		}
 
 		///////////////
 		/// Send instantiate transaction to orderer
-		System.out.println("Sending instantiateTransaction to orderer without arguments");
+		logger.info("Sending instantiateTransaction to orderer without arguments");
 		chain.sendTransaction(successful, chain.getOrderers()).thenApply(transactionEvent -> {
 
 			if (transactionEvent.isValid()) {
-				System.out.println("Finished transaction with transaction id " + transactionEvent.getTransactionID());
+				logger.info("Finished transaction with transaction id " + transactionEvent.getTransactionID());
 			} else {
-				System.out.println("Failed to sending instatiate transaction to orderer!");
+				logger.info("Failed to sending instatiate transaction to orderer!");
 			}
 			chain.shutdown(true);
 			return null;

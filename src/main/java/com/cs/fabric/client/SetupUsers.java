@@ -81,7 +81,7 @@ public class SetupUsers {
 		clientHelper.setPeerAdmin(sampleStore, sampleOrg);
 		logger.info("Set peer admin");
 
-		System.out.println("Set up users for Org1. OK!");
+		logger.info("Set up users for Org1. OK!");
 	}
 
 }
