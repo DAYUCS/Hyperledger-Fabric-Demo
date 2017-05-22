@@ -7,8 +7,8 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hyperledger.fabric.sdk.Chain;
-import org.hyperledger.fabric.sdk.ChainConfiguration;
+import org.hyperledger.fabric.sdk.Channel;
+import org.hyperledger.fabric.sdk.ChannelConfiguration;
 import org.hyperledger.fabric.sdk.EventHub;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.Orderer;
@@ -18,15 +18,15 @@ import com.cs.fabric.client.utils.ClientHelper;
 import com.cs.fabric.sdk.utils.ClientConfig;
 import com.cs.fabric.sdkintegration.SampleOrg;
 
-public class ConstructChain {
+public class ConstructChannel {
 
 	private static final ClientHelper clientHelper = new ClientHelper();
 	private static final ClientConfig clientConfig = ClientConfig.getConfig();
 
 	private static final String TEST_FIXTURES_PATH = "src/test/fixture";
-	private static final String FOO_CHAIN_NAME = "foo";
+	private static final String FOO_CHANNEL_NAME = "foo";
 
-	private static final Log logger = LogFactory.getLog(ConstructChain.class);
+	private static final Log logger = LogFactory.getLog(ConstructChannel.class);
 
 	public static void main(String[] args) throws Exception {
 
@@ -37,7 +37,7 @@ public class ConstructChain {
 		HFClient client = clientHelper.getHFClient();
 
 		// Begin construction
-		logger.info("Constructing chain " + FOO_CHAIN_NAME);
+		logger.info("Constructing channel " + FOO_CHANNEL_NAME);
 
 		Collection<Orderer> orderers = new LinkedList<>();
 
@@ -46,24 +46,24 @@ public class ConstructChain {
 					clientConfig.getOrdererProperties(orderName)));
 		}
 
-		// Just pick the first orderer in the list to create the chain.
-
+		// Just pick the first orderer in the list to create the channel.
 		Orderer anOrderer = orderers.iterator().next();
 		orderers.remove(anOrderer);
 
-		ChainConfiguration chainConfiguration = new ChainConfiguration(
-				new File(TEST_FIXTURES_PATH + "/sdkintegration/e2e-2Orgs/channel/" + FOO_CHAIN_NAME + ".tx"));
+		ChannelConfiguration chainConfiguration = new ChannelConfiguration(
+				new File(TEST_FIXTURES_PATH + "/sdkintegration/e2e-2Orgs/channel/" + FOO_CHANNEL_NAME + ".tx"));
 
 		// Only peer Admin org
 		client.setUserContext(sampleOrg.getPeerAdmin());
 
-		// Create chain that has only one signer that is this orgs peer admin.
-		// If chain creation policy needed more signature they would need to be
+		// Create channel that has only one signer that is this orgs peer admin.
+		// If channel creation policy needed more signature they would need to
+		// be
 		// added too.
-		Chain newChain = client.newChain(FOO_CHAIN_NAME, anOrderer, chainConfiguration,
-				client.getChainConfigurationSignature(chainConfiguration, sampleOrg.getPeerAdmin()));
+		Channel newChannel = client.newChannel(FOO_CHANNEL_NAME, anOrderer, chainConfiguration,
+				client.getChannelConfigurationSignature(chainConfiguration, sampleOrg.getPeerAdmin()));
 
-		logger.info("Created chain " + FOO_CHAIN_NAME);
+		logger.info("Created chain " + FOO_CHANNEL_NAME);
 
 		for (String peerName : sampleOrg.getPeerNames()) {
 			String peerLocation = sampleOrg.getPeerLocation(peerName);
@@ -82,28 +82,28 @@ public class ConstructChain {
 			peerProperties.put("grpc.ManagedChannelBuilderOption.maxInboundMessageSize", 9000000);
 
 			Peer peer = client.newPeer(peerName, peerLocation, peerProperties);
-			newChain.joinPeer(peer);
-			logger.info("Peer " + peerName + "joined chain " + FOO_CHAIN_NAME);
+			newChannel.joinPeer(peer);
+			logger.info("Peer " + peerName + "joined channel " + FOO_CHANNEL_NAME);
 			sampleOrg.addPeer(peer);
 		}
 
 		for (Orderer orderer : orderers) { // add remaining orderers if any.
-			newChain.addOrderer(orderer);
+			newChannel.addOrderer(orderer);
 		}
 
 		for (String eventHubName : sampleOrg.getEventHubNames()) {
 			EventHub eventHub = client.newEventHub(eventHubName, sampleOrg.getEventHubLocation(eventHubName),
 					clientConfig.getEventHubProperties(eventHubName));
-			newChain.addEventHub(eventHub);
+			newChannel.addEventHub(eventHub);
 		}
 
-		newChain.initialize();
+		newChannel.initialize();
 
-		logger.info("Finished initialization chain " + FOO_CHAIN_NAME);
-		
-		//newChain.shutdown(true);
-		
-		//logger.info("Shutdown chain " + FOO_CHAIN_NAME);
+		logger.info("Finished initialization channel " + FOO_CHANNEL_NAME);
+
+		// newChain.shutdown(true);
+
+		// logger.info("Shutdown chain " + FOO_CHAIN_NAME);
 
 	}
 }

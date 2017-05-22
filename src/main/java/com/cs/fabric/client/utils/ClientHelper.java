@@ -14,8 +14,8 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hyperledger.fabric.sdk.Chain;
-import org.hyperledger.fabric.sdk.ChainCodeID;
+import org.hyperledger.fabric.sdk.Channel;
+import org.hyperledger.fabric.sdk.ChaincodeID;
 import org.hyperledger.fabric.sdk.EventHub;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.Orderer;
@@ -34,7 +34,7 @@ public class ClientHelper {
 
 	private static final String TEST_ADMIN_NAME = "admin";
 	private static final String TESTUSER_1_NAME = "user1";
-	private static final String FOO_CHAIN_NAME = "foo";
+	private static final String FOO_CHANNEL_NAME = "foo";
 	private static final String CHAIN_CODE_NAME = "trade_finance_go";
 	private static final String CHAIN_CODE_PATH = "github.com/trade_finance";
 	private static final String CHAIN_CODE_VERSION = "1";
@@ -122,35 +122,35 @@ public class ClientHelper {
 
 	}
 
-	public Chain getChainWithPeerAdmin() throws NoSuchAlgorithmException, NoSuchProviderException,
+	public Channel getChannelWithPeerAdmin() throws NoSuchAlgorithmException, NoSuchProviderException,
 			InvalidKeySpecException, IOException, CryptoException, InvalidArgumentException, TransactionException {
 		SampleOrg sampleOrg = this.getSamleOrg();
 		HFClient client = this.getHFClient();
 
 		client.setUserContext(sampleOrg.getPeerAdmin());
-		return getChain(sampleOrg, client);
+		return getChannel(sampleOrg, client);
 
 	}
 
-	public Chain getChainWithUser() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException,
+	public Channel getChannelWithUser() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException,
 			IOException, CryptoException, InvalidArgumentException, TransactionException {
 		SampleOrg sampleOrg = this.getSamleOrg();
 		HFClient client = this.getHFClient();
 
 		client.setUserContext(sampleOrg.getUser(TESTUSER_1_NAME));
-		return getChain(sampleOrg, client);
+		return getChannel(sampleOrg, client);
 
 	}
 
-	private Chain getChain(SampleOrg sampleOrg, HFClient client)
+	private Channel getChannel(SampleOrg sampleOrg, HFClient client)
 			throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException,
 			CryptoException, InvalidArgumentException, TransactionException {
 
-		Chain chain = client.newChain(FOO_CHAIN_NAME);
-		logger.info("Get Chain " + FOO_CHAIN_NAME);
+		Channel channel = client.newChannel(FOO_CHANNEL_NAME);
+		logger.info("Get Chain " + FOO_CHANNEL_NAME);
 
-		chain.setTransactionWaitTime(clientConfig.getTransactionWaitTime());
-		chain.setDeployWaitTime(clientConfig.getDeployWaitTime());
+		channel.setTransactionWaitTime(clientConfig.getTransactionWaitTime());
+		channel.setDeployWaitTime(clientConfig.getDeployWaitTime());
 
 		// Collection<Peer> channelPeers = new LinkedList<>();
 		for (String peerName : sampleOrg.getPeerNames()) {
@@ -165,7 +165,7 @@ public class ClientHelper {
 			peerProperties.put("grpc.ManagedChannelBuilderOption.maxInboundMessageSize", 9000000);
 			// channelPeers.add(client.newPeer(peerName, peerLocation,
 			// peerProperties));
-			chain.addPeer(client.newPeer(peerName, peerLocation, peerProperties));
+			channel.addPeer(client.newPeer(peerName, peerLocation, peerProperties));
 		}
 
 		Collection<Orderer> orderers = new LinkedList<>();
@@ -177,23 +177,23 @@ public class ClientHelper {
 
 		// Just pick the first orderer in the list to create the chain.
 		Orderer anOrderer = orderers.iterator().next();
-		chain.addOrderer(anOrderer);
+		channel.addOrderer(anOrderer);
 
 		for (String eventHubName : sampleOrg.getEventHubNames()) {
 			EventHub eventHub = client.newEventHub(eventHubName, sampleOrg.getEventHubLocation(eventHubName),
 					clientConfig.getEventHubProperties(eventHubName));
-			chain.addEventHub(eventHub);
+			channel.addEventHub(eventHub);
 		}
 
-		if (!chain.isInitialized()) {
-			chain.initialize();
+		if (!channel.isInitialized()) {
+			channel.initialize();
 		}
 
-		return chain;
+		return channel;
 	}
 
-	public ChainCodeID getChainCodeID() {
-		return ChainCodeID.newBuilder().setName(CHAIN_CODE_NAME).setVersion(CHAIN_CODE_VERSION).setPath(CHAIN_CODE_PATH)
+	public ChaincodeID getChaincodeID() {
+		return ChaincodeID.newBuilder().setName(CHAIN_CODE_NAME).setVersion(CHAIN_CODE_VERSION).setPath(CHAIN_CODE_PATH)
 				.build();
 	}
 }

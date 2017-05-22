@@ -14,7 +14,8 @@ import org.hyperledger.fabric.sdk.exception.TransactionException;
 
 public class Payment {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws CryptoException, InvalidArgumentException, NoSuchAlgorithmException,
+			NoSuchProviderException, InvalidKeySpecException, TransactionException, IOException {
 
 		final String[] arguments = new String[] { "payment", "IMLC-000001" };
 
@@ -22,22 +23,7 @@ public class Payment {
 
 		try {
 			invokeChainCode.invoke();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchProviderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidKeySpecException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CryptoException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (InvalidArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TransactionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {

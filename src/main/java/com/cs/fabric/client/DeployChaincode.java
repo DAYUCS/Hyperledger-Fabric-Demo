@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hyperledger.fabric.sdk.Chain;
-import org.hyperledger.fabric.sdk.ChainCodeID;
+import org.hyperledger.fabric.sdk.Channel;
+import org.hyperledger.fabric.sdk.ChaincodeID;
 import org.hyperledger.fabric.sdk.ChaincodeEndorsementPolicy;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.InstallProposalRequest;
@@ -25,15 +25,15 @@ import com.cs.fabric.client.utils.ClientHelper;
 import com.cs.fabric.sdk.utils.ClientConfig;
 import com.cs.fabric.sdkintegration.SampleOrg;
 
-public class DeployChainCode {
+public class DeployChaincode {
 
 	private static final ClientHelper clientHelper = new ClientHelper();
 	private static final ClientConfig clientConfig = ClientConfig.getConfig();
-	private static final String FOO_CHAIN_NAME = "foo";
+	private static final String FOO_CHANNEL_NAME = "foo";
 	private static final String TEST_FIXTURES_PATH = "src/test/fixture";
 	private static final String CHAIN_CODE_VERSION = "1";
 
-	private static final Log logger = LogFactory.getLog(DeployChainCode.class);
+	private static final Log logger = LogFactory.getLog(DeployChaincode.class);
 
 	public static void main(String[] args) throws Exception {
 
@@ -45,10 +45,10 @@ public class DeployChainCode {
 
 		client.setUserContext(sampleOrg.getPeerAdmin());
 
-		Chain chain = clientHelper.getChainWithPeerAdmin();
-		logger.info("Get Chain " + FOO_CHAIN_NAME);
+		Channel channel = clientHelper.getChannelWithPeerAdmin();
+		logger.info("Get Channel " + FOO_CHANNEL_NAME);
 
-		final ChainCodeID chainCodeID = clientHelper.getChainCodeID();
+		final ChaincodeID chaincodeID = clientHelper.getChaincodeID();
 		Collection<ProposalResponse> responses;
 		Collection<ProposalResponse> successful = new LinkedList<>();
 		Collection<ProposalResponse> failed = new LinkedList<>();
@@ -66,7 +66,7 @@ public class DeployChainCode {
 		logger.info("Creating install proposal");
 
 		InstallProposalRequest installProposalRequest = client.newInstallProposalRequest();
-		installProposalRequest.setChaincodeID(chainCodeID);
+		installProposalRequest.setChaincodeID(chaincodeID);
 		//// For GO language and serving just a single user, chaincodeSource is
 		//// mostly likely the users GOPATH
 		installProposalRequest
@@ -83,12 +83,12 @@ public class DeployChainCode {
 
 		Set<Peer> peersFromOrg = sampleOrg.getPeers();
 		numInstallProposal = numInstallProposal + peersFromOrg.size();
-		responses = client.sendInstallProposal(installProposalRequest, chain.getPeers());
+		responses = client.sendInstallProposal(installProposalRequest, channel.getPeers());
 
 		for (ProposalResponse response : responses) {
 			if (response.getStatus() == ProposalResponse.Status.SUCCESS) {
-				logger.info("Successful install proposal response Txid: " + response.getTransactionID()
-						+ " from peer" + response.getPeer().getName());
+				logger.info("Successful install proposal response Txid: " + response.getTransactionID() + " from peer"
+						+ response.getPeer().getName());
 				successful.add(response);
 			} else {
 				failed.add(response);
@@ -107,7 +107,7 @@ public class DeployChainCode {
 		//// Instantiate chain code.
 		InstantiateProposalRequest instantiateProposalRequest = client.newInstantiationProposalRequest();
 		instantiateProposalRequest.setProposalWaitTime(60000);
-		instantiateProposalRequest.setChaincodeID(chainCodeID);
+		instantiateProposalRequest.setChaincodeID(chaincodeID);
 		instantiateProposalRequest.setFcn("init");
 		instantiateProposalRequest.setArgs(new String[] {});
 		Map<String, byte[]> tm = new HashMap<>();
@@ -130,7 +130,7 @@ public class DeployChainCode {
 		failed.clear();
 
 		// client.setUserContext(sampleOrg.getAdmin());
-		responses = chain.sendInstantiationProposal(instantiateProposalRequest, chain.getPeers());
+		responses = channel.sendInstantiationProposal(instantiateProposalRequest, channel.getPeers());
 		for (ProposalResponse response : responses) {
 			if (response.isVerified() && response.getStatus() == ProposalResponse.Status.SUCCESS) {
 				successful.add(response);
@@ -151,14 +151,14 @@ public class DeployChainCode {
 		///////////////
 		/// Send instantiate transaction to orderer
 		logger.info("Sending instantiateTransaction to orderer without arguments");
-		chain.sendTransaction(successful, chain.getOrderers()).thenApply(transactionEvent -> {
+		channel.sendTransaction(successful, channel.getOrderers()).thenApply(transactionEvent -> {
 
 			if (transactionEvent.isValid()) {
 				logger.info("Finished transaction with transaction id " + transactionEvent.getTransactionID());
 			} else {
 				logger.info("Failed to sending instatiate transaction to orderer!");
 			}
-			//chain.shutdown(true);
+			// chain.shutdown(true);
 			return null;
 		}).get(clientConfig.getTransactionWaitTime(), TimeUnit.SECONDS);
 	}
