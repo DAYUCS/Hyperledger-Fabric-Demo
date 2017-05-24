@@ -122,7 +122,7 @@ public class ClientHelper {
 
 	}
 
-	public Channel getChannelWithPeerAdmin() throws NoSuchAlgorithmException, NoSuchProviderException,
+	public Channel getChannel() throws NoSuchAlgorithmException, NoSuchProviderException,
 			InvalidKeySpecException, IOException, CryptoException, InvalidArgumentException, TransactionException {
 		SampleOrg sampleOrg = this.getSamleOrg();
 		HFClient client = this.getHFClient();
@@ -132,15 +132,15 @@ public class ClientHelper {
 
 	}
 
-	public Channel getChannelWithUser() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException,
-			IOException, CryptoException, InvalidArgumentException, TransactionException {
-		SampleOrg sampleOrg = this.getSamleOrg();
-		HFClient client = this.getHFClient();
-
-		client.setUserContext(sampleOrg.getUser(TESTUSER_1_NAME));
-		return getChannel(sampleOrg, client);
-
-	}
+//	public Channel getChannelWithUser() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException,
+//			IOException, CryptoException, InvalidArgumentException, TransactionException {
+//		SampleOrg sampleOrg = this.getSamleOrg();
+//		HFClient client = this.getHFClient();
+//
+//		client.setUserContext(sampleOrg.getUser(TESTUSER_1_NAME));
+//		return getChannel(sampleOrg, client);
+//
+//	}
 
 	private Channel getChannel(SampleOrg sampleOrg, HFClient client)
 			throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, IOException,

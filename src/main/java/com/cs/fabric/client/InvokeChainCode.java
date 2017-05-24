@@ -11,17 +11,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.ChaincodeID;
+import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.ProposalResponse;
 import org.hyperledger.fabric.sdk.QueryByChaincodeRequest;
+import org.hyperledger.fabric.sdk.SDKUtils;
 import org.hyperledger.fabric.sdk.TransactionProposalRequest;
 import org.hyperledger.fabric.sdk.exception.CryptoException;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
@@ -30,10 +32,12 @@ import org.hyperledger.fabric.sdk.exception.TransactionException;
 
 import com.cs.fabric.client.utils.ClientHelper;
 import com.cs.fabric.sdk.utils.ClientConfig;
+import com.cs.fabric.sdkintegration.SampleOrg;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 public class InvokeChainCode {
 
+	private static final String TESTUSER_1_NAME = "user1";
 	private static final ClientHelper clientHelper = new ClientHelper();
 	private static final ClientConfig clientConfig = ClientConfig.getConfig();
 	private static final Log logger = LogFactory.getLog(InvokeChainCode.class);
@@ -46,8 +50,10 @@ public class InvokeChainCode {
 			NoSuchProviderException, InvalidKeySpecException, TransactionException, IOException {
 		this.args = args;
 		this.client = clientHelper.getHFClient();
-		this.channel = clientHelper.getChannelWithPeerAdmin();
+		this.channel = clientHelper.getChannel();
 		this.chaincodeID = clientHelper.getChaincodeID();
+		SampleOrg sampleOrg = clientHelper.getSamleOrg();
+		this.client.setUserContext(sampleOrg.getUser(TESTUSER_1_NAME));
 	}
 
 	public void invoke() throws InvalidArgumentException, ProposalException, InvalidProtocolBufferException,
@@ -94,6 +100,17 @@ public class InvokeChainCode {
 				failed.add(response);
 			}
 		}
+
+		// Check that all the proposals are consistent with each other. We
+		// should have only one set
+		// where all the proposals above are consistent.
+		Collection<Set<ProposalResponse>> proposalConsistencySets = SDKUtils
+				.getProposalConsistencySets(transactionPropResp);
+		if (proposalConsistencySets.size() != 1) {
+			logger.error(
+					"Expected only one set of consistent proposal responses but got " + proposalConsistencySets.size());
+		}
+
 		// out("Received %d transaction proposal responses. Successful+verified:
 		// %d . Failed: %d",
 		// transactionPropResp.size(), successful.size(), failed.size());

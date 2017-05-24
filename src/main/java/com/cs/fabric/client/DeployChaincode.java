@@ -20,6 +20,7 @@ import org.hyperledger.fabric.sdk.InstallProposalRequest;
 import org.hyperledger.fabric.sdk.InstantiateProposalRequest;
 import org.hyperledger.fabric.sdk.Peer;
 import org.hyperledger.fabric.sdk.ProposalResponse;
+import org.hyperledger.fabric.sdk.SDKUtils;
 
 import com.cs.fabric.client.utils.ClientHelper;
 import com.cs.fabric.sdk.utils.ClientConfig;
@@ -45,7 +46,7 @@ public class DeployChaincode {
 
 		client.setUserContext(sampleOrg.getPeerAdmin());
 
-		Channel channel = clientHelper.getChannelWithPeerAdmin();
+		Channel channel = clientHelper.getChannel();
 		logger.info("Get Channel " + FOO_CHANNEL_NAME);
 
 		final ChaincodeID chaincodeID = clientHelper.getChaincodeID();
@@ -95,6 +96,7 @@ public class DeployChaincode {
 			}
 		}
 
+		SDKUtils.getProposalConsistencySets(responses);
 		logger.info("Received " + numInstallProposal + " install proposal responses. Successful+verified: "
 				+ successful.size() + ". Failed: " + failed.size());
 
