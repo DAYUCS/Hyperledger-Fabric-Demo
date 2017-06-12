@@ -37,7 +37,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class InvokeChainCode {
 
-	private static final String TESTUSER_1_NAME = "user1";
+	//private static final String TESTUSER_1_NAME = "user1";
 	private static final ClientHelper clientHelper = new ClientHelper();
 	private static final ClientConfig clientConfig = ClientConfig.getConfig();
 	private static final Log logger = LogFactory.getLog(InvokeChainCode.class);
@@ -53,7 +53,7 @@ public class InvokeChainCode {
 		this.channel = clientHelper.getChannel();
 		this.chaincodeID = clientHelper.getChaincodeID();
 		SampleOrg sampleOrg = clientHelper.getSamleOrg();
-		this.client.setUserContext(sampleOrg.getUser(TESTUSER_1_NAME));
+		this.client.setUserContext(sampleOrg.getPeerAdmin()); // Maybe a bug of 1.0.0beta, only peer admin can call chaincode?
 	}
 
 	public void invoke() throws InvalidArgumentException, ProposalException, InvalidProtocolBufferException,

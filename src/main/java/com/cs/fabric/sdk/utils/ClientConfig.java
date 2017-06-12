@@ -50,6 +50,7 @@ public class ClientConfig {
 	private static final String GOSSIPWAITTIME = PROPBASE + "GossipWaitTime";
 	private static final String INVOKEWAITTIME = PROPBASE + "InvokeWaitTime";
 	private static final String DEPLOYWAITTIME = PROPBASE + "DeployWaitTime";
+	private static final String PROPOSALWAITTIME = PROPBASE + "ProposalWaitTime";
 
 	private static final String INTEGRATIONTESTS_ORG = PROPBASE + "integrationTests.org.";
 	private static final Pattern orgPat = Pattern
@@ -71,6 +72,7 @@ public class ClientConfig {
 		defaultProperty(GOSSIPWAITTIME, "5000");
 		defaultProperty(INVOKEWAITTIME, "100000");
 		defaultProperty(DEPLOYWAITTIME, "120000");
+		defaultProperty(PROPOSALWAITTIME, "120000");
 
 		//////
 		defaultProperty(INTEGRATIONTESTS_ORG + "peerOrg1.mspid", "Org1MSP");
@@ -255,6 +257,15 @@ public class ClientConfig {
 
 	public int getGossipWaitTime() {
 		return Integer.parseInt(getProperty(GOSSIPWAITTIME));
+	}
+
+	/**
+	 * Time to wait for proposal to complete
+	 *
+	 * @return
+	 */
+	public long getProposalWaitTime() {
+		return Integer.parseInt(getProperty(PROPOSALWAITTIME));
 	}
 
 	public Collection<SampleOrg> getIntegrationTestsSampleOrgs() {

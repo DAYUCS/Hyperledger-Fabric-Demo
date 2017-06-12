@@ -126,6 +126,11 @@ func (t *TradeFinanceChaincode) inspect(stub shim.ChaincodeStubInterface, args [
 		return shim.Error("Error saving inspection data")
 	}
 
+	if transientMap, err := stub.GetTransient(); err == nil {
+		if transientData, ok := transientMap["result"]; ok {
+			return shim.Success(transientData)
+		}
+	}
 	return shim.Success(nil)
 }
 
@@ -178,6 +183,11 @@ func (t *TradeFinanceChaincode) ship(stub shim.ChaincodeStubInterface, args []st
 		return shim.Error("Error saving B/L status")
 	}
 
+	if transientMap, err := stub.GetTransient(); err == nil {
+		if transientData, ok := transientMap["result"]; ok {
+			return shim.Success(transientData)
+		}
+	}
 	return shim.Success(tradeFinanceBytesNew)
 }
 
@@ -230,6 +240,11 @@ func (t *TradeFinanceChaincode) present(stub shim.ChaincodeStubInterface, args [
 		return shim.Error("Error saving Present Documents status")
 	}
 
+	if transientMap, err := stub.GetTransient(); err == nil {
+		if transientData, ok := transientMap["result"]; ok {
+			return shim.Success(transientData)
+		}
+	}
 	return shim.Success(tradeFinanceBytesNew)
 }
 
@@ -282,6 +297,11 @@ func (t *TradeFinanceChaincode) arrival(stub shim.ChaincodeStubInterface, args [
 		return shim.Error("Error saving Documents Arrival status")
 	}
 
+	if transientMap, err := stub.GetTransient(); err == nil {
+		if transientData, ok := transientMap["result"]; ok {
+			return shim.Success(transientData)
+		}
+	}
 	return shim.Success(tradeFinanceBytesNew)
 }
 
@@ -334,6 +354,11 @@ func (t *TradeFinanceChaincode) payment(stub shim.ChaincodeStubInterface, args [
 		return shim.Error("Error saving Payment status")
 	}
 
+	if transientMap, err := stub.GetTransient(); err == nil {
+		if transientData, ok := transientMap["result"]; ok {
+			return shim.Success(transientData)
+		}
+	}
 	return shim.Success(tradeFinanceBytesNew)
 }
 
