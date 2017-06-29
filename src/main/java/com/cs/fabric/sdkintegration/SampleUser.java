@@ -193,7 +193,7 @@ public class SampleUser implements User, Serializable {
                     this.organization = state.organization;
                     this.enrollmentSecret = state.enrollmentSecret;
                     this.enrollment = state.enrollment;
-                    this.mspID = state.mspID;
+                    this.mspId = state.mspId;
                     return this;
                 }
             } catch (Exception e) {
@@ -226,14 +226,14 @@ public class SampleUser implements User, Serializable {
 
 
     @Override
-    public String getMSPID() {
-        return mspID;
+    public String getMspId() {
+        return mspId;
     }
 
-    String mspID;
+    String mspId;
 
-    public void setMPSID(String mspID) {
-        this.mspID = mspID;
+    public void setMspId(String mspID) {
+        this.mspId = mspID;
         saveState();
 
     }

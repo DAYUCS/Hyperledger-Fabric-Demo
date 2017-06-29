@@ -128,7 +128,7 @@ public class SampleStore {
 			// Create the SampleUser and try to restore it's state from the key
 			// value store (if found).
 			sampleUser = new SampleUser(name, org, this);
-			sampleUser.setMPSID(MSPID);
+			sampleUser.setMspId(MSPID);
 
 			String certificate = new String(IOUtils.toByteArray(new FileInputStream(certificateFile)), "UTF-8");
 

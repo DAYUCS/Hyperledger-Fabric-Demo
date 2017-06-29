@@ -63,7 +63,7 @@ public class SetupUsers {
 		if (!admin.isEnrolled()) { // Preregistered admin only needs to be
 									// enrolled with Fabric caClient.
 			admin.setEnrollment(ca.enroll(admin.getName(), "adminpw"));
-			admin.setMPSID(mspid);
+			admin.setMspId(mspid);
 		}
 
 		sampleOrg.setAdmin(admin); // The admin of this org --
@@ -76,7 +76,7 @@ public class SetupUsers {
 		}
 		if (!user.isEnrolled()) {
 			user.setEnrollment(ca.enroll(user.getName(), user.getEnrollmentSecret()));
-			user.setMPSID(mspid);
+			user.setMspId(mspid);
 		}
 		sampleOrg.addUser(user); // Remember user belongs to this Org
 		logger.info("Set sampleOrg user");

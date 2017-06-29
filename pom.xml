@@ -4,7 +4,7 @@
 
 	<groupId>com.cs.fabric</groupId>
 	<artifactId>client</artifactId>
-	<version>1.0.0-beta</version>
+	<version>1.0.0-rc1</version>
 	<packaging>jar</packaging>
 
 	<name>client</name>
@@ -25,7 +25,7 @@
 			<groupId>org.hyperledger.fabric-sdk-java</groupId>
 			<artifactId>fabric-sdk-java</artifactId>
 			<scope>runtime</scope>
-			<version>1.0.0-beta</version>
+			<version>1.0.0-rc1</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
