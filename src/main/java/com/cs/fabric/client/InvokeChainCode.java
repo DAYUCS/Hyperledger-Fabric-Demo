@@ -53,6 +53,7 @@ public class InvokeChainCode {
 		this.channel = clientHelper.getChannel();
 		this.chaincodeID = clientHelper.getChaincodeID();
 		SampleOrg sampleOrg = clientHelper.getSamleOrg();
+		//this.client.setUserContext(sampleOrg.getUser(TESTUSER_1_NAME));
 		this.client.setUserContext(sampleOrg.getPeerAdmin()); // Maybe a bug of 1.0.0beta, only peer admin can call chaincode?
 	}
 
