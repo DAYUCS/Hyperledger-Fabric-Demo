@@ -1,6 +1,9 @@
 package com.cs.fabric.client;
 
+import static java.lang.String.format;
+
 import java.io.File;
+import java.nio.file.Paths;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -83,6 +86,19 @@ public class SetupUsers {
 
 		clientHelper.setPeerAdmin(sampleStore, sampleOrg);
 		logger.info("Set peer admin");
+		
+
+        final String sampleOrgName = sampleOrg.getName();
+        final String sampleOrgDomainName = sampleOrg.getDomainName();
+
+        // src/test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/
+        SampleUser peerOrgAdmin = sampleStore.getMember(sampleOrgName + "Admin", sampleOrgName, sampleOrg.getMSPID(),
+                ClientHelper.findFile_sk(Paths.get(clientConfig.getTestChannelPath(), "crypto-config/peerOrganizations/",
+                        sampleOrgDomainName, format("/users/Admin@%s/msp/keystore", sampleOrgDomainName)).toFile()),
+                Paths.get(clientConfig.getTestChannelPath(), "crypto-config/peerOrganizations/", sampleOrgDomainName,
+                        format("/users/Admin@%s/msp/signcerts/Admin@%s-cert.pem", sampleOrgDomainName, sampleOrgDomainName)).toFile());
+
+        sampleOrg.setPeerAdmin(peerOrgAdmin); //A special user that can create channels, join peers and install chaincode
 
 		logger.info("Set up users for Org1. OK!");
 	}

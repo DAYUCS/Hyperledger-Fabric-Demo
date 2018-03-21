@@ -21,6 +21,7 @@ import org.hyperledger.fabric.sdk.InstantiateProposalRequest;
 import org.hyperledger.fabric.sdk.Peer;
 import org.hyperledger.fabric.sdk.ProposalResponse;
 import org.hyperledger.fabric.sdk.SDKUtils;
+import org.hyperledger.fabric.sdk.TransactionRequest.Type;
 
 import com.cs.fabric.client.utils.ClientHelper;
 import com.cs.fabric.sdk.utils.ClientConfig;
@@ -73,6 +74,7 @@ public class DeployChaincode {
 		installProposalRequest
 				.setChaincodeSourceLocation(new File(TEST_FIXTURES_PATH + "/sdkintegration/gocc/sample2"));
 		installProposalRequest.setChaincodeVersion(CHAIN_CODE_VERSION);
+		installProposalRequest.setChaincodeLanguage(Type.GO_LANG);
 
 		logger.info("Sending install proposal");
 		////////////////////////////
@@ -96,7 +98,7 @@ public class DeployChaincode {
 			}
 		}
 
-		SDKUtils.getProposalConsistencySets(responses);
+		//SDKUtils.getProposalConsistencySets(responses);
 		logger.info("Received " + numInstallProposal + " install proposal responses. Successful+verified: "
 				+ successful.size() + ". Failed: " + failed.size());
 
@@ -110,6 +112,7 @@ public class DeployChaincode {
 		InstantiateProposalRequest instantiateProposalRequest = client.newInstantiationProposalRequest();
 		instantiateProposalRequest.setProposalWaitTime(60000);
 		instantiateProposalRequest.setChaincodeID(chaincodeID);
+		instantiateProposalRequest.setChaincodeLanguage(Type.GO_LANG);
 		instantiateProposalRequest.setFcn("init");
 		instantiateProposalRequest.setArgs(new String[] {});
 		Map<String, byte[]> tm = new HashMap<>();

@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
@@ -47,7 +48,7 @@ public class InvokeChainCode {
 	private ChaincodeID chaincodeID;
 
 	public InvokeChainCode(String[] args) throws CryptoException, InvalidArgumentException, NoSuchAlgorithmException,
-			NoSuchProviderException, InvalidKeySpecException, TransactionException, IOException {
+			NoSuchProviderException, InvalidKeySpecException, TransactionException, IOException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
 		this.args = args;
 		this.client = clientHelper.getHFClient();
 		this.channel = clientHelper.getChannel();

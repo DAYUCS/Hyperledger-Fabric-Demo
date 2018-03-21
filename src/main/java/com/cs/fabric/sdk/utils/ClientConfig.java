@@ -148,7 +148,7 @@ public class ClientConfig {
 					httpTLSify(sdkProperties.getProperty((INTEGRATIONTESTS_ORG + org.getKey() + ".ca_location"))));
 
 			if (runningFabricCATLS) {
-				String cert = "src/test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/DNAME/ca/ca.DNAME-cert.pem"
+				String cert = "src/test/fixture/sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/DNAME/ca/ca.DNAME-cert.pem"
 						.replaceAll("DNAME", domainName);
 				File cf = new File(cert);
 				if (!cf.exists() || !cf.isFile()) {
@@ -295,7 +295,7 @@ public class ClientConfig {
 
 		final String domainName = getDomainName(name);
 
-		File cert = Paths.get(getTestChannlePath(), "crypto-config/ordererOrganizations".replace("orderer", type),
+		File cert = Paths.get(getTestChannelPath(), "crypto-config/ordererOrganizations".replace("orderer", type),
 				domainName, type + "s", name, "tls/server.crt").toFile();
 		if (!cert.exists()) {
 			throw new RuntimeException(String.format("Missing cert file for: %s. Could not find at location: %s", name,
@@ -359,9 +359,9 @@ public class ClientConfig {
 		return ret;
 	}
 
-	public String getTestChannlePath() {
+	public String getTestChannelPath() {
 
-		return "src/test/fixture/sdkintegration/e2e-2Orgs/channel";
+		return "src/test/fixture/sdkintegration/e2e-2Orgs/v1.1";
 
 	}
 

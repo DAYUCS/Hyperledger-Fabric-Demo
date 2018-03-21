@@ -53,7 +53,7 @@ public class ConstructChannel {
 		orderers.remove(anOrderer);
 
 		ChannelConfiguration chainConfiguration = new ChannelConfiguration(
-				new File(TEST_FIXTURES_PATH + "/sdkintegration/e2e-2Orgs/channel/" + FOO_CHANNEL_NAME + ".tx"));
+				new File(TEST_FIXTURES_PATH + "/sdkintegration/e2e-2Orgs/v1.1/" + FOO_CHANNEL_NAME + ".tx"));
 
 
 		// Create channel that has only one signer that is this orgs peer admin.

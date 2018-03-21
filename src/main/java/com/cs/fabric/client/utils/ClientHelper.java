@@ -4,6 +4,7 @@ import static java.lang.String.format;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -77,9 +78,9 @@ public class ClientHelper {
 		final String sampleOrgDomainName = sampleOrg.getDomainName();
 
 		SampleUser peerOrgAdmin = sampleStore.getMember(sampleOrgName + "Admin", sampleOrgName, sampleOrg.getMSPID(),
-				findFile_sk(Paths.get(clientConfig.getTestChannlePath(), "crypto-config/peerOrganizations/",
+				findFile_sk(Paths.get(clientConfig.getTestChannelPath(), "crypto-config/peerOrganizations/",
 						sampleOrgDomainName, format("/users/Admin@%s/msp/keystore", sampleOrgDomainName)).toFile()),
-				Paths.get(clientConfig.getTestChannlePath(), "crypto-config/peerOrganizations/", sampleOrgDomainName,
+				Paths.get(clientConfig.getTestChannelPath(), "crypto-config/peerOrganizations/", sampleOrgDomainName,
 						format("/users/Admin@%s/msp/signcerts/Admin@%s-cert.pem", sampleOrgDomainName,
 								sampleOrgDomainName))
 						.toFile());
@@ -92,7 +93,7 @@ public class ClientHelper {
 		return sampleOrg;
 	}
 
-	public HFClient getHFClient() throws CryptoException, InvalidArgumentException {
+	public HFClient getHFClient() throws CryptoException, InvalidArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
 
 		// Create instance of client.
 		HFClient client = HFClient.createNewInstance();
@@ -104,7 +105,7 @@ public class ClientHelper {
 		return client;
 	}
 
-	static File findFile_sk(File directory) {
+	public static File findFile_sk(File directory) {
 
 		File[] matches = directory.listFiles((dir, name) -> name.endsWith("_sk"));
 
@@ -123,7 +124,7 @@ public class ClientHelper {
 	}
 
 	public Channel getChannel() throws NoSuchAlgorithmException, NoSuchProviderException,
-			InvalidKeySpecException, IOException, CryptoException, InvalidArgumentException, TransactionException {
+			InvalidKeySpecException, IOException, CryptoException, InvalidArgumentException, TransactionException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
 		SampleOrg sampleOrg = this.getSamleOrg();
 		HFClient client = this.getHFClient();
 
@@ -149,8 +150,8 @@ public class ClientHelper {
 		Channel channel = client.newChannel(FOO_CHANNEL_NAME);
 		logger.info("Get Chain " + FOO_CHANNEL_NAME);
 
-		channel.setTransactionWaitTime(clientConfig.getTransactionWaitTime());
-		channel.setDeployWaitTime(clientConfig.getDeployWaitTime());
+		//channel.setTransactionWaitTime(clientConfig.getTransactionWaitTime());
+		//channel.setDeployWaitTime(clientConfig.getDeployWaitTime());
 
 		// Collection<Peer> channelPeers = new LinkedList<>();
 		for (String peerName : sampleOrg.getPeerNames()) {
